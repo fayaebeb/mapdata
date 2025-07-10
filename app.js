@@ -31,6 +31,17 @@ let shopData = [];
 let markers = [];
 
 function getIcon(type) {
+  if (type === 'default') {
+    return L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      shadowSize: [41, 41]
+    });
+  }
+
   const emoji = shopIcons[type] || shopIcons.default;
   return L.divIcon({
     className: 'custom-icon',
@@ -94,9 +105,9 @@ async function loadArea(area) {
   document.querySelectorAll('#area-buttons button').forEach(btn =>
     btn.classList.remove('active')
   );
-
   const activeBtn = document.querySelector(`#area-buttons button[data-area="${area}"]`);
   if (activeBtn) activeBtn.classList.add('active');
+
   const res = await fetch(areaFiles[area]);
   const data = await res.json();
   const elements = data.elements || data;
@@ -107,10 +118,13 @@ async function loadArea(area) {
 
   shopData.forEach(shop => {
     const name = shop.tags?.name || '名前なしのショップ';
-    const type = shop.tags?.shop || '不明';
+    const rawType = shop.tags?.shop;
+    const type = shopIcons[rawType] ? rawType : 'default';
+
     const marker = L.marker([shop.lat, shop.lon], {
       icon: getIcon(type)
-    }).bindPopup(`<strong>${name}</strong><br>種類: ${type}`);
+    }).bindPopup(`<strong>${name}</strong><br>種類: ${rawType || '不明'}`);
+
     markers.push(marker);
   });
 

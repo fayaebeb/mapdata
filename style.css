@@ -138,5 +138,6 @@ main {
   color: var(--accent);
   border: 2px solid var(--accent);
   font-weight: bold;
-  box-shadow: var(--shadow);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); /* extra glow */
+  transform: scale(1.03);
 }
