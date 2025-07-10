@@ -5,37 +5,113 @@ const areaFiles = {
   umeda: 'umeda.json'
 };
 
-let map = L.map('map').setView([35.6804, 139.7690], 13);
-let markers = L.layerGroup().addTo(map);
+const shopIcons = {
+  convenience: '🛒',
+  supermarket: '🥦',
+  gift: '🎁',
+  bakery: '🥐',
+  clothes: '👕',
+  florist: '🌷',
+  car: '🚗',
+  jewelry: '💍',
+  books: '📚',
+  alcohol: '🍶',
+  fabric: '🧵',
+  hairdresser: '💇',
+  default: '📌'
+};
 
-// Base tile
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
+let map = L.map('map').setView([35.68, 139.76], 13);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap, Carto'
 }).addTo(map);
 
-async function loadArea(area) {
-  const file = areaFiles[area];
-  const response = await fetch(file);
-  const data = await response.json();
-  const elements = data.elements || data;
+let markerCluster = L.markerClusterGroup().addTo(map);
+let shopData = [];
+let markers = [];
 
-  markers.clearLayers();
+function getIcon(type) {
+  const emoji = shopIcons[type] || shopIcons.default;
+  return L.divIcon({
+    className: 'custom-icon',
+    html: `<div>${emoji}</div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 30]
+  });
+}
 
-  const shopCoords = [];
+function updateFilterOptions(data) {
+  const uniqueTypes = [...new Set(data.map(s => s.tags?.shop).filter(Boolean))];
+  const filter = document.getElementById('filter');
+  filter.innerHTML = `<option value="">All types</option>`;
+  uniqueTypes.forEach(type => {
+    filter.innerHTML += `<option value="${type}">${type}</option>`;
+  });
+}
 
-  elements.forEach((el) => {
-    if (el.lat && el.lon) {
-      const name = el.tags?.name || 'Unnamed shop';
-      const type = el.tags?.shop || 'Unknown type';
-      const popupContent = `<strong>${name}</strong><br/>Type: ${type}`;
-      const marker = L.marker([el.lat, el.lon]).bindPopup(popupContent);
-      marker.addTo(markers);
-      shopCoords.push([el.lat, el.lon]);
-    }
+function renderShopList(data) {
+  const list = document.getElementById('shop-list');
+  list.innerHTML = '';
+  data.forEach((shop, index) => {
+    const name = shop.tags?.name || 'Unnamed Shop';
+    const type = shop.tags?.shop || 'unknown';
+    const item = document.createElement('div');
+    item.className = 'shop-item';
+    item.innerHTML = `<strong>${name}</strong><br><small>${type}</small>`;
+    item.onclick = () => {
+      map.setView([shop.lat, shop.lon], 18);
+      markers[index].openPopup();
+    };
+    list.appendChild(item);
+  });
+}
+
+function applyFilters() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const typeFilter = document.getElementById('filter').value;
+
+  const filtered = shopData.filter(shop => {
+    const name = shop.tags?.name?.toLowerCase() || '';
+    const type = shop.tags?.shop || '';
+    return (
+      name.includes(search) &&
+      (typeFilter === '' || type === typeFilter)
+    );
   });
 
-  if (shopCoords.length > 0) {
-    const bounds = L.latLngBounds(shopCoords);
-    map.fitBounds(bounds, { padding: [50, 50] });
-  }
+  markerCluster.clearLayers();
+  filtered.forEach((shop, index) => {
+    markerCluster.addLayer(markers[index]);
+  });
+
+  renderShopList(filtered);
+}
+
+document.getElementById('search').addEventListener('input', applyFilters);
+document.getElementById('filter').addEventListener('change', applyFilters);
+
+async function loadArea(area) {
+  const res = await fetch(areaFiles[area]);
+  const data = await res.json();
+  const elements = data.elements || data;
+
+  shopData = elements.filter(s => s.lat && s.lon);
+  markerCluster.clearLayers();
+  markers = [];
+
+  shopData.forEach(shop => {
+    const name = shop.tags?.name || 'Unnamed Shop';
+    const type = shop.tags?.shop || 'unknown';
+    const marker = L.marker([shop.lat, shop.lon], {
+      icon: getIcon(type)
+    }).bindPopup(`<strong>${name}</strong><br>Type: ${type}`);
+    markers.push(marker);
+  });
+
+  markers.forEach(m => markerCluster.addLayer(m));
+  updateFilterOptions(shopData);
+  applyFilters();
+
+  const bounds = L.latLngBounds(shopData.map(s => [s.lat, s.lon]));
+  map.flyToBounds(bounds, { padding: [50, 50] });
 }
