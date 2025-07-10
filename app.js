@@ -91,6 +91,12 @@ document.getElementById('search').addEventListener('input', applyFilters);
 document.getElementById('filter').addEventListener('change', applyFilters);
 
 async function loadArea(area) {
+  document.querySelectorAll('#area-buttons button').forEach(btn =>
+    btn.classList.remove('active')
+  );
+
+  const activeBtn = document.querySelector(`#area-buttons button[data-area="${area}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
   const res = await fetch(areaFiles[area]);
   const data = await res.json();
   const elements = data.elements || data;

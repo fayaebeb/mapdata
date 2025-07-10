@@ -132,3 +132,11 @@ main {
     height: calc(100vh - 370px);
   }
 }
+
+#area-buttons button.active {
+  background-color: #ffffff;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  font-weight: bold;
+  box-shadow: var(--shadow);
+}
