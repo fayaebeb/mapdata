@@ -1,0 +1,122 @@
+https://overpass-turbo.eu/
+https://www.convertcsv.com/json-to-csv.htm
+
+🗺️ 1. Shibuya, Tokyo
+
+
+[out:json][timeout:60];
+
+{{geocodeArea:Shibuya, Tokyo}}->.searchArea;
+
+(
+  node["shop"](area.searchArea);
+  way["shop"](area.searchArea);
+  relation["shop"](area.searchArea);
+);
+
+out body center;
+
+
+🗺️ 2. Azabudai, Tokyo
+
+[out:json][timeout:60];
+
+{{geocodeArea:Azabudai, Tokyo}}->.searchArea;
+
+(
+  node["shop"](area.searchArea);
+  way["shop"](area.searchArea);
+  relation["shop"](area.searchArea);
+);
+
+out body center;
+
+
+🗺️ 3. Yaesu, Tokyo
+
+[out:json][timeout:60];
+
+{{geocodeArea:Yaesu, Tokyo}}->.searchArea;
+
+(
+  node["shop"](area.searchArea);
+  way["shop"](area.searchArea);
+  relation["shop"](area.searchArea);
+);
+
+out body center;
+
+
+🗺️ 4. Umeda, Osaka
+
+
+[out:json][timeout:60];
+
+{{geocodeArea:Umeda, Osaka}}->.searchArea;
+
+(
+  node["shop"](area.searchArea);
+  way["shop"](area.searchArea);
+  relation["shop"](area.searchArea);
+);
+
+out body center;
+
+
+approximate bounding box for the Umeda district:
+
+[out:json][timeout:60];
+
+(
+  node["shop"](34.696,135.490,34.710,135.508);
+  way["shop"](34.696,135.490,34.710,135.508);
+  relation["shop"](34.696,135.490,34.710,135.508);
+);
+
+out body center;
+
+
+
+
+
+With time stamp meta data:
+
+[out:json][timeout:25];
+// Shibuya ward boundary (admin_level=7)
+area["name:en"="Shibuya"]["boundary"="administrative"]["admin_level"="7"]->.a;
+(
+  node(area.a)["shop"];
+  way(area.a)["shop"];
+  relation(area.a)["shop"];
+);
+out meta;
+
+
+[out:json][timeout:25];
+// Approximate bounding box for Azabudai (Minato-ku)
+(
+  node["shop"](35.659,139.737,35.664,139.742);
+  way["shop"](35.659,139.737,35.664,139.742);
+  relation["shop"](35.659,139.737,35.664,139.742);
+);
+out meta;
+
+
+[out:json][timeout:25];
+// Approximate bounding box for Yaesu
+(
+  node["shop"](35.677,139.766,35.682,139.772);
+  way["shop"](35.677,139.766,35.682,139.772);
+  relation["shop"](35.677,139.766,35.682,139.772);
+);
+out meta;
+
+
+[out:json][timeout:25];
+// Approximate bounding box for Umeda (Osaka)
+(
+  node["shop"](34.698,135.493,34.704,135.502);
+  way["shop"](34.698,135.493,34.704,135.502);
+  relation["shop"](34.698,135.493,34.704,135.502);
+);
+out meta;

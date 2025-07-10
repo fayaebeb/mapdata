@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tokyo Shops Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Tokyo Shops Map</h1>
+    <div id="area-buttons">
+      <button onclick="loadArea('shibuya')">Shibuya</button>
+      <button onclick="loadArea('azabudai')">Azabudai</button>
+      <button onclick="loadArea('yaesu')">Yaesu</button>
+      <button onclick="loadArea('umeda')">Umeda</button>
+    </div>
+  </header>
+  <main>
+    <div id="map"></div>
+  </main>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
