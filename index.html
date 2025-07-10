@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tokyo Shops Dashboard</title>
+  <title>🗾店データマップ</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
@@ -11,27 +11,27 @@
 </head>
 <body>
   <header>
-    <h1>🛍️ Tokyo Shops Map</h1>
+    <h1>🌆🗼パシフィックコンサルタンツ 🏪🗾店データマップ</h1>
     <nav id="area-buttons">
-      <button onclick="loadArea('shibuya')">Shibuya</button>
-      <button onclick="loadArea('azabudai')">Azabudai</button>
-      <button onclick="loadArea('yaesu')">Yaesu</button>
-      <button onclick="loadArea('umeda')">Umeda</button>
+      <button onclick="loadArea('shibuya')">渋谷</button>
+      <button onclick="loadArea('azabudai')">麻布台</button>
+      <button onclick="loadArea('yaesu')">八重洲</button>
+      <button onclick="loadArea('umeda')">梅田</button>
     </nav>
   </header>
   <main>
-    <div id="map"></div>
-    <aside id="sidebar">
-      <div class="sidebar-header">
-        <h2>Shop Explorer</h2>
-        <input type="text" id="search" placeholder="🔍 Search shops..." />
-        <select id="filter">
-          <option value="">All types</option>
-        </select>
-      </div>
-      <div id="shop-list">Select an area to view shops.</div>
-    </aside>
-  </main>
+  <div id="map"></div>
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h2>ショップ探索</h2>
+      <input type="text" id="search" placeholder="🔍 ショップを検索..." />
+      <select id="filter">
+        <option value="">すべての種類</option>
+      </select>
+    </div>
+    <div id="shop-list">エリアを選択してショップを表示してください。</div>
+  </aside>
+</main>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="app.js"></script>

@@ -22,8 +22,8 @@ const shopIcons = {
 };
 
 let map = L.map('map').setView([35.68, 139.76], 13);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap, Carto'
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
 let markerCluster = L.markerClusterGroup().addTo(map);
@@ -43,7 +43,7 @@ function getIcon(type) {
 function updateFilterOptions(data) {
   const uniqueTypes = [...new Set(data.map(s => s.tags?.shop).filter(Boolean))];
   const filter = document.getElementById('filter');
-  filter.innerHTML = `<option value="">All types</option>`;
+  filter.innerHTML = `<option value="">すべての種類</option>`;
   uniqueTypes.forEach(type => {
     filter.innerHTML += `<option value="${type}">${type}</option>`;
   });
@@ -53,8 +53,8 @@ function renderShopList(data) {
   const list = document.getElementById('shop-list');
   list.innerHTML = '';
   data.forEach((shop, index) => {
-    const name = shop.tags?.name || 'Unnamed Shop';
-    const type = shop.tags?.shop || 'unknown';
+    const name = shop.tags?.name || '名前なしのショップ';
+    const type = shop.tags?.shop || '不明';
     const item = document.createElement('div');
     item.className = 'shop-item';
     item.innerHTML = `<strong>${name}</strong><br><small>${type}</small>`;
@@ -100,11 +100,11 @@ async function loadArea(area) {
   markers = [];
 
   shopData.forEach(shop => {
-    const name = shop.tags?.name || 'Unnamed Shop';
-    const type = shop.tags?.shop || 'unknown';
+    const name = shop.tags?.name || '名前なしのショップ';
+    const type = shop.tags?.shop || '不明';
     const marker = L.marker([shop.lat, shop.lon], {
       icon: getIcon(type)
-    }).bindPopup(`<strong>${name}</strong><br>Type: ${type}`);
+    }).bindPopup(`<strong>${name}</strong><br>種類: ${type}`);
     markers.push(marker);
   });
 
