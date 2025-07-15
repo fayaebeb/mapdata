@@ -22,9 +22,7 @@ const shopIcons = {
 };
 
 let map = L.map('map').setView([35.68, 139.76], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 let markerCluster = L.markerClusterGroup().addTo(map);
 let shopData = [];
