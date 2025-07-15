@@ -158,10 +158,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 🌍 Geolocation
+let userLocationMarker; // store it to update if needed
+
 document.getElementById('geo-btn').addEventListener('click', () => {
-  if (!navigator.geolocation) return alert("位置情報が利用できません。");
+  if (!navigator.geolocation) {
+    alert("位置情報が利用できません。");
+    return;
+  }
+
   navigator.geolocation.getCurrentPosition(
-    pos => map.setView([pos.coords.latitude, pos.coords.longitude], 16),
+    pos => {
+      const { latitude, longitude } = pos.coords;
+
+      // Remove existing user marker if present
+      if (userLocationMarker) map.removeLayer(userLocationMarker);
+
+      // Add new marker with popup
+      userLocationMarker = L.marker([latitude, longitude])
+        .addTo(map)
+        .bindPopup("📍 現在地")
+        .openPopup();
+
+      map.setView([latitude, longitude], 16);
+    },
     () => alert("現在地を取得できませんでした。")
   );
 });
