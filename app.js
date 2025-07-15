@@ -100,36 +100,47 @@ document.getElementById('search').addEventListener('input', applyFilters);
 document.getElementById('filter').addEventListener('change', applyFilters);
 
 async function loadArea(area) {
-  document.querySelectorAll('#area-buttons button').forEach(btn =>
-    btn.classList.remove('active')
-  );
-  const activeBtn = document.querySelector(`#area-buttons button[data-area="${area}"]`);
-  if (activeBtn) activeBtn.classList.add('active');
+  try {
+    document.querySelectorAll('#area-buttons button').forEach(btn =>
+      btn.classList.remove('active')
+    );
+    const activeBtn = document.querySelector(`#area-buttons button[data-area="${area}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
 
-  const res = await fetch(areaFiles[area]);
-  const data = await res.json();
-  const elements = data.elements || data;
+    const list = document.getElementById('shop-list');
+    list.textContent = '🔄 データを読み込み中...';
 
-  shopData = elements.filter(s => s.lat && s.lon);
-  markerCluster.clearLayers();
-  markers = [];
+    const res = await fetch(areaFiles[area]);
+    if (!res.ok) throw new Error('データの読み込みに失敗しました。');
 
-  shopData.forEach(shop => {
-    const name = shop.tags?.name || '名前なしのショップ';
-    const rawType = shop.tags?.shop;
-    const type = shopIcons[rawType] ? rawType : 'default';
+    const data = await res.json();
+    const elements = data.elements || data;
 
-    const marker = L.marker([shop.lat, shop.lon], {
-      icon: getIcon(type)
-    }).bindPopup(`<strong>${name}</strong><br>種類: ${rawType || '不明'}`);
+    shopData = elements.filter(s => s.lat && s.lon);
+    markerCluster.clearLayers();
+    markers = [];
 
-    markers.push(marker);
-  });
+    shopData.forEach(shop => {
+      const name = shop.tags?.name || '名前なしのショップ';
+      const rawType = shop.tags?.shop;
+      const type = shopIcons[rawType] ? rawType : 'default';
 
-  markers.forEach(m => markerCluster.addLayer(m));
-  updateFilterOptions(shopData);
-  applyFilters();
+      const marker = L.marker([shop.lat, shop.lon], {
+        icon: getIcon(type)
+      }).bindPopup(`<strong>${name}</strong><br>種類: ${rawType || '不明'}`);
 
-  const bounds = L.latLngBounds(shopData.map(s => [s.lat, s.lon]));
-  map.flyToBounds(bounds, { padding: [50, 50] });
+      markers.push(marker);
+    });
+
+    markers.forEach(m => markerCluster.addLayer(m));
+    updateFilterOptions(shopData);
+    applyFilters();
+
+    const bounds = L.latLngBounds(shopData.map(s => [s.lat, s.lon]));
+    map.flyToBounds(bounds, { padding: [50, 50] });
+
+  } catch (error) {
+    document.getElementById('shop-list').textContent = '❌ データの読み込みに失敗しました。';
+    console.error(error);
+  }
 }

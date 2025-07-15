@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🗾店データマップ</title>
+  <meta name="description" content="店舗データをマップで視覚化するツール。" />
+  <title>🗾 店データマップ | パシフィックコンサルタンツ</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
@@ -13,30 +13,33 @@
 
 <body>
   <header>
-    <h1>🌆🗼パシフィックコンサルタンツ 🏪🗾店データマップ</h1>
-    <nav id="area-buttons">
-      <button data-area="shibuya" onclick="loadArea('shibuya')">渋谷</button>
-      <button data-area="azabudai" onclick="loadArea('azabudai')">麻布台</button>
-      <button data-area="yaesu" onclick="loadArea('yaesu')">八重洲</button>
-      <button data-area="umeda" onclick="loadArea('umeda')">梅田</button>
+    <h1>🌆🗼 パシフィックコンサルタンツ 🏪🗾 店データマップ</h1>
+    <nav aria-label="エリア選択">
+      <ul id="area-buttons">
+        <li><button data-area="shibuya" onclick="loadArea('shibuya')">渋谷</button></li>
+        <li><button data-area="azabudai" onclick="loadArea('azabudai')">麻布台</button></li>
+        <li><button data-area="yaesu" onclick="loadArea('yaesu')">八重洲</button></li>
+        <li><button data-area="umeda" onclick="loadArea('umeda')">梅田</button></li>
+      </ul>
     </nav>
   </header>
+
   <main>
-    <div id="map"></div>
+    <div id="map" role="region" aria-label="地図"></div>
     <aside id="sidebar">
       <div class="sidebar-header">
         <h2>ショップ探索</h2>
-        <input type="text" id="search" placeholder="🔍 ショップを検索..." />
-        <select id="filter">
+        <input type="text" id="search" placeholder="🔍 ショップを検索..." aria-label="ショップ検索" />
+        <select id="filter" aria-label="ショップの種類を絞り込む">
           <option value="">すべての種類</option>
         </select>
       </div>
-      <div id="shop-list">エリアを選択してショップを表示してください。</div>
+      <div id="shop-list" aria-live="polite">エリアを選択してショップを表示してください。</div>
     </aside>
   </main>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="app.js"></script>
 </body>
-
 </html>
