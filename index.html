@@ -14,14 +14,21 @@
 <body>
   <header>
     <h1>🌆🗼 パシフィックコンサルタンツ 🏪🗾 店データマップ</h1>
-    <nav aria-label="エリア選択">
-      <ul id="area-buttons">
-        <li><button data-area="shibuya" onclick="loadArea('shibuya')">渋谷</button></li>
-        <li><button data-area="azabudai" onclick="loadArea('azabudai')">麻布台</button></li>
-        <li><button data-area="yaesu" onclick="loadArea('yaesu')">八重洲</button></li>
-        <li><button data-area="umeda" onclick="loadArea('umeda')">梅田</button></li>
-      </ul>
-    </nav>
+    <div class="top-controls">
+      <nav aria-label="エリア選択">
+        <ul id="area-buttons">
+          <li><button data-area="shibuya" onclick="loadArea('shibuya')">渋谷</button></li>
+          <li><button data-area="azabudai" onclick="loadArea('azabudai')">麻布台</button></li>
+          <li><button data-area="yaesu" onclick="loadArea('yaesu')">八重洲</button></li>
+          <li><button data-area="umeda" onclick="loadArea('umeda')">梅田</button></li>
+        </ul>
+      </nav>
+      <div class="right-buttons">
+        <button id="geo-btn">📍 現在地</button>
+        <button id="dark-mode-toggle">🌙 ダークモード</button>
+        <button id="csv-export">📄 CSV</button>
+      </div>
+    </div>
   </header>
 
   <main>
