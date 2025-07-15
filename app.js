@@ -1,8 +1,8 @@
 const areaFiles = {
-  shibuya: 'shibuya.json',
-  azabudai: 'azabudai.json',
-  yaesu: 'yaesu.json',
-  umeda: 'umeda.json'
+  shibuya: 'data/shibuya.json',
+  azabudai: 'data/azabudai.json',
+  yaesu: 'data/yaesu.json',
+  umeda: 'data/umeda.json'
 };
 
 const shopIcons = {
