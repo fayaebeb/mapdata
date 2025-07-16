@@ -197,3 +197,16 @@ body.dark input, body.dark select {
   display: flex;
   gap: 0.5rem;
 }
+
+.toggle-button {
+  background: var(--accent);
+  color: white;
+  border: 2px solid var(--accent);
+  font-weight: bold;
+  box-shadow: var(--shadow);
+}
+
+.toggle-button.active {
+  background: white;
+  color: var(--accent);
+}

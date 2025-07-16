@@ -21,12 +21,23 @@ const shopIcons = {
   default: '📌'
 };
 
-let map = L.map('map').setView([35.68, 139.76], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+// Initial tile layers
+const lightTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap, CartoDB',
+});
+
+let map = L.map('map', {
+  center: [35.68, 139.76],
+  zoom: 13,
+  layers: [lightTile]
+});
 
 let markerCluster = L.markerClusterGroup().addTo(map);
 let shopData = [];
 let markers = [];
+let visibleShops = [];
+let useCluster = true;
 
 function getIcon(type) {
   if (type === 'default') {
@@ -65,13 +76,14 @@ function renderShopList(data) {
     const tags = shop.tags || {};
     const name = tags.name || '名前なしのショップ';
     const type = tags.shop || '不明';
+    const icon = shopIcons[type] || shopIcons.default;
     const phone = tags.phone ? `<br>📞 ${tags.phone}` : '';
     const website = tags.website ? `<br>🔗 <a href="${tags.website}" target="_blank">Webサイト</a>` : '';
     const address = tags['addr:full'] || '';
 
     const item = document.createElement('div');
     item.className = 'shop-item';
-    item.innerHTML = `<strong>${name}</strong><br><small>${type}</small><br>${address}${phone}${website}`;
+    item.innerHTML = `${icon} <strong>${name}</strong><br><small>${type}</small><br>${address}${phone}${website}`;
     item.onclick = () => {
       map.setView([shop.lat, shop.lon], 18);
       markers[index].openPopup();
@@ -88,17 +100,33 @@ function applyFilters() {
   localStorage.setItem('shopFilter', typeFilter);
 
   visibleShops = shopData.filter(shop => {
-    const name = (shop.tags?.name || '').toLowerCase();
-    const type = shop.tags?.shop || '';
-    return name.includes(search) && (typeFilter === '' || type === typeFilter);
+    const tags = shop.tags || {};
+    const name = (tags.name || '').toLowerCase();
+    const type = (tags.shop || '').toLowerCase();
+    const address = (tags['addr:full'] || '').toLowerCase();
+    return (name.includes(search) || type.includes(search) || address.includes(search)) &&
+      (typeFilter === '' || type === typeFilter);
   });
 
   markerCluster.clearLayers();
-  visibleShops.forEach((_, i) => markerCluster.addLayer(markers[i]));
+  markers.forEach(m => map.removeLayer(m));
+
+  if (useCluster) {
+    visibleShops.forEach((_, i) => markerCluster.addLayer(markers[i]));
+    map.addLayer(markerCluster);
+  } else {
+    visibleShops.forEach((_, i) => markers[i].addTo(map));
+  }
+
   renderShopList(visibleShops);
 }
 
-document.getElementById('search').addEventListener('input', applyFilters);
+// Debounced input handler
+let debounceTimeout;
+document.getElementById('search').addEventListener('input', () => {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(applyFilters, 300);
+});
 document.getElementById('filter').addEventListener('change', applyFilters);
 
 async function loadArea(area) {
@@ -109,8 +137,7 @@ async function loadArea(area) {
     const activeBtn = document.querySelector(`#area-buttons button[data-area="${area}"]`);
     if (activeBtn) activeBtn.classList.add('active');
 
-    const list = document.getElementById('shop-list');
-    list.textContent = '🔄 データを読み込み中...';
+    document.getElementById('shop-list').textContent = '🔄 データを読み込み中...';
 
     const res = await fetch(areaFiles[area]);
     if (!res.ok) throw new Error('データの読み込みに失敗しました。');
@@ -123,8 +150,9 @@ async function loadArea(area) {
     markers = [];
 
     shopData.forEach(shop => {
-      const name = shop.tags?.name || '名前なしのショップ';
-      const rawType = shop.tags?.shop;
+      const tags = shop.tags || {};
+      const name = tags.name || '名前なしのショップ';
+      const rawType = tags.shop;
       const type = shopIcons[rawType] ? rawType : 'default';
 
       const marker = L.marker([shop.lat, shop.lon], {
@@ -147,19 +175,22 @@ async function loadArea(area) {
   }
 }
 
-// 🚩 Persist filters/dark mode
+// Persistent settings
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('filter').value = localStorage.getItem('shopFilter') || '';
   document.getElementById('search').value = localStorage.getItem('shopSearch') || '';
   applyFilters();
 
   const prefersDark = localStorage.getItem('darkMode') === 'true';
-  if (prefersDark) document.body.classList.add('dark');
+  if (prefersDark) {
+    document.body.classList.add('dark');
+    map.removeLayer(lightTile);
+    darkTile.addTo(map);
+  }
 });
 
-// 🌍 Geolocation
-let userLocationMarker; // store it to update if needed
-
+// Geolocation
+let userLocationMarker;
 document.getElementById('geo-btn').addEventListener('click', () => {
   if (!navigator.geolocation) {
     alert("位置情報が利用できません。");
@@ -169,11 +200,8 @@ document.getElementById('geo-btn').addEventListener('click', () => {
   navigator.geolocation.getCurrentPosition(
     pos => {
       const { latitude, longitude } = pos.coords;
-
-      // Remove existing user marker if present
       if (userLocationMarker) map.removeLayer(userLocationMarker);
 
-      // Add new marker with popup
       userLocationMarker = L.marker([latitude, longitude])
         .addTo(map)
         .bindPopup("📍 現在地")
@@ -185,13 +213,27 @@ document.getElementById('geo-btn').addEventListener('click', () => {
   );
 });
 
-// 🌒 Dark mode toggle
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+// Dark mode toggle with tile switch
+const darkToggle = document.getElementById('dark-mode-toggle');
+darkToggle.addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('darkMode', isDark);
+  darkToggle.classList.toggle('active', isDark);
+
+  map.removeLayer(isDark ? lightTile : darkTile);
+  (isDark ? darkTile : lightTile).addTo(map);
 });
 
-// 📤 CSV Export
+// Restore toggle state on load
+if (localStorage.getItem('darkMode') === 'true') {
+  document.getElementById('dark-mode-toggle').classList.add('active');
+}
+
+if (useCluster) {
+  document.getElementById('cluster-toggle').classList.add('active');
+}
+
+// CSV Export
 document.getElementById('csv-export').addEventListener('click', () => {
   const rows = visibleShops.map(shop => {
     const tags = shop.tags || {};
@@ -214,4 +256,21 @@ document.getElementById('csv-export').addEventListener('click', () => {
   link.href = URL.createObjectURL(blob);
   link.download = 'visible_shops.csv';
   link.click();
+});
+
+// Cluster toggle button
+const clusterToggle = document.getElementById('cluster-toggle');
+clusterToggle.addEventListener('click', () => {
+  useCluster = !useCluster;
+  clusterToggle.classList.toggle('active', useCluster);
+
+  markerCluster.clearLayers();
+  markers.forEach(m => map.removeLayer(m));
+
+  if (useCluster) {
+    visibleShops.forEach((_, i) => markerCluster.addLayer(markers[i]));
+    map.addLayer(markerCluster);
+  } else {
+    visibleShops.forEach((_, i) => markers[i].addTo(map));
+  }
 });
