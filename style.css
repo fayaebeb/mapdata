@@ -117,7 +117,7 @@ main {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--radius) 0 0 var(--radius);
+  border-radius: var(--radius);
   z-index: 1000;
   margin-top: 1.5rem;
   margin-right: 0.5rem;
@@ -215,4 +215,15 @@ a:hover {
   #map {
     height: 100%;
   }
+}
+
+.custom-icon div {
+  font-size: 1.3rem;
+  text-align: center;
+  background: white;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  width: 32px;
+  height: 32px;
+  line-height: 28px;
 }
